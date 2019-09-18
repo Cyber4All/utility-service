@@ -46,6 +46,12 @@ export default class ExpressRouteDriver {
       res.send(ServerlessCache.cachedValue);
     });
 
+    // CLARK MAINTENANCE NOTIFICATION
+    router.get('/maintenance', async(req, res) => {
+      
+      res.send(true);
+    });
+
     // BUSINESS CARDS
     router.get(
       '/users/:username/cards',
