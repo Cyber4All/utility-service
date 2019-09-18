@@ -37,6 +37,11 @@ export default class ExpressRouteDriver {
    */
   setRoutes(router: Router) {
 
+    router.get('/', async(req, res) => {
+      res.send('CLARK Utility Service running on localhost:9000');
+    });
+
+    // APP STATUS
     router.get('/status', async (req, res) => {
       res.send(ServerlessCache.cachedValue);
     });
@@ -52,6 +57,7 @@ export default class ExpressRouteDriver {
       }),
     );
 
+    // VERSION CHECK
     router.get('/clientversion/:clientVersion', async (req, res) => {
       try {
         const response = await fetch(process.env.CLIENTVERSIONURL);
