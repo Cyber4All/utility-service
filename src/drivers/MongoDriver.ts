@@ -22,12 +22,12 @@ export class MongoDriver {
   private async connect(dbURI: string, retryAttempt?: number): Promise<void> {
     try {
       MongoDriver.mongoClient = await MongoClient.connect(dbURI);
-      MongoDriver.db = MongoDriver.mongoClient.db();
+      MongoDriver.db = MongoDriver.mongoClient.db('utility');
     } catch (error) {
       if (!retryAttempt) {
         this.connect(dbURI, 1);
       } else {
-        // reportError(error);
+        reportError(error);
         return Promise.reject(
           `Problem connecting to database at ${dbURI}. \n ${error}`
         );

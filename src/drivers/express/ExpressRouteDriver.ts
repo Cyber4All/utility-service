@@ -8,6 +8,7 @@ import {
 } from '../../routes';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
+import * as interactor from '../../maintenance/maintenanceInteractor';
 
 const BUSINESS_CARD_API = process.env.BUSINESS_CARD_API || 'localhost:3009';
 
@@ -48,8 +49,8 @@ export default class ExpressRouteDriver {
 
     // CLARK MAINTENANCE NOTIFICATION
     router.get('/maintenance', async(req, res) => {
-      
-      res.send(true);
+      const mango = await interactor.getMaintenanceStatus();
+      res.send(mango);
     });
 
     // BUSINESS CARDS
