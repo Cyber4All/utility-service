@@ -54,7 +54,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace: 
-          at: ~/learning-object-service
+          at: ~/utility-service
       - setup_remote_docker
       - run:
           name: Login to docker
@@ -66,7 +66,7 @@ jobs:
           name: Publish Image 
           command: |
             export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
-            docker tag "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}" "${DOCKER_USER_ORG}/learning-object-service:${SEMVER}"
+            docker tag "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}" "${DOCKER_USER_ORG}/utility-service:${SEMVER}"
             docker push "${DOCKER_USER_ORG}/utility-service:${SEMVER}"
       - run:
           name: Deploy to ECS
