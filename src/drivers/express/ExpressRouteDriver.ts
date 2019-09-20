@@ -1,16 +1,9 @@
 import * as express from 'express';
 import { Router } from 'express';
-// tslint:disable-next-line:no-require-imports
-import proxy = require('express-http-proxy');
 import 'dotenv/config';
-import {
-  BUSINESS_CARD_ROUTES,
-} from '../../routes';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
 import * as interactor from '../../maintenance/maintenanceInteractor';
-
-const BUSINESS_CARD_API = process.env.BUSINESS_CARD_API || 'localhost:3009';
 
 /**
  * Serves as a factory for producing a router for the express app.rt
@@ -52,17 +45,6 @@ export default class ExpressRouteDriver {
       const mango = await interactor.getMaintenanceStatus();
       res.send(mango);
     });
-
-    // BUSINESS CARDS
-    router.get(
-      '/users/:username/cards',
-      proxy(BUSINESS_CARD_API, {
-        proxyReqPathResolver: req => {
-          const username = req.params.username;
-          return BUSINESS_CARD_ROUTES.CARD(username, req.query);
-        },
-      }),
-    );
 
     // VERSION CHECK
     router.get('/clientversion/:clientVersion', async (req, res) => {
