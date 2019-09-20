@@ -53,8 +53,7 @@ jobs:
   deploy-production:
     <<: *defaults
     steps:
-      - attach_workspace: 
-          at: ~/utility-service
+      - checkout
       - setup_remote_docker
       - run:
           name: Login to docker
