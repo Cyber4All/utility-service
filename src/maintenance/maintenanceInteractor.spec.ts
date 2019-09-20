@@ -1,10 +1,21 @@
-import * as maintenance from './maintenanceInteractor';
-import { }
-
+let maintenance: any;
 describe('get maintenance status', () => {
+    beforeAll(async() => {
+        jest.doMock('./maintenanceStore', () => ({
+            __esModule: true,
+            MaintenanceStore: {
+              getInstance: () => ({
+                getMaintenanceStatus: async () => {
+                    return { _id: 'hello', clarkDown: true };
+                }
+              }),
+            },
+          }));
+        maintenance = await import('./maintenanceInteractor');
+    });
     it('should return a boolean to determine if the site is under maintenance', async () => {
-        const clarkDown = await maintenance.getMaintenanceStatus();
-        expect(clarkDown).resolves.toBeDefined();
+        await expect(maintenance.getMaintenanceStatus())
+            .resolves.toBe(true);
     });
 });
 
