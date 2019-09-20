@@ -1,5 +1,5 @@
 defaults: &defaults
-  working_directory: ~/CLARK-Gateway
+  working_directory: ~/utility-service
   docker:
     - image: cyber4all/circleci-aws:node-alpine
 
@@ -25,7 +25,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace : 
-          at: ~/CLARK-Gateway
+          at: ~/utility-service
       - run:
           name: Setup AWS credentials
           command: |
