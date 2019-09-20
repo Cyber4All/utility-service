@@ -9,18 +9,34 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Install Dependencies
-          command: npm install
+          name: Build Imgae
+          command: |
+            docker build -t $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1
       - run:
-          name: Build Application
-          command: npm run build
-      - persist_to_workspace: 
-          root: ./
-          paths: 
-              - ./dist
-              - ./package.json
-              - ./.elasticbeanstalk
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Publish Image
+          command: |
+            docker push "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}"
+  test:
+    <<: *defaults
+    steps: 
+      - setup_remote_docker
+      - run: 
+          name: Get Image
+          command: docker pull $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1
+      - run: 
+          name: Run Tests
+          command: docker run $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 npm test
+
+
+
+
+
+
   deploy:
     <<: *defaults
     steps:
@@ -47,6 +63,11 @@ workflows:
           filters:
             branches:
               ignore: /master/
+      - test:
+          filters:
+            branches:
+              ignore: /master/
+              
   build-and-deploy:
     jobs:
       - build:
