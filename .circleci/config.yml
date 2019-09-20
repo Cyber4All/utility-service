@@ -11,9 +11,9 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Build Imgae
+          name: Build Image
           command: |
-            docker build -t $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1
+            docker build -t $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 .
       - run:
           name: Login to docker
           command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
@@ -31,11 +31,6 @@ jobs:
       - run: 
           name: Run Tests
           command: docker run $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 npm test
-
-
-
-
-
 
   deploy:
     <<: *defaults
