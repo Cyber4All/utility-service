@@ -1,8 +1,7 @@
 import { MaintenanceStore } from './maintenanceStore';
 
 export async function getMaintenanceStatus(): Promise<boolean> {
-    const maintenance = await getDataStore().getMaintenanceStatus();
-    return maintenance.clarkDown;
+    return await getDataStore().getMaintenanceStatus();
 }
 
 function getDataStore() {

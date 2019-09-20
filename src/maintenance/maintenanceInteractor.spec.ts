@@ -6,7 +6,7 @@ describe('get maintenance status', () => {
             MaintenanceStore: {
               getInstance: () => ({
                 getMaintenanceStatus: async () => {
-                    return { _id: 'hello', clarkDown: true };
+                    return true;
                 }
               }),
             },
