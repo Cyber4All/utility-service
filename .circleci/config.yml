@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/utility-service
   docker:
-    - image: cyber4all/circleci-aws:node-alpine
+    - image: cyber4all/circleci-aws:docker-git
 
 version: 2
 jobs:
@@ -9,53 +9,108 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Install Dependencies
-          command: npm install
+          name: Build Image
+          command: |
+            docker build -t $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 .
       - run:
-          name: Build Application
-          command: npm run build
-      - persist_to_workspace: 
-          root: ./
-          paths: 
-              - ./dist
-              - ./package.json
-              - ./.elasticbeanstalk
-  deploy:
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Publish Image
+          command: |
+            docker push "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}"
+
+  test:
+    <<: *defaults
+    steps: 
+      - setup_remote_docker
+      - run: 
+          name: Get Image
+          command: docker pull $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1
+      - run: 
+          name: Run Tests
+          command: docker run $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 npm test
+
+  create-sentry-release:
+    <<: *defaults
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run:
+          name: Install Sentry CLI
+          command: curl -sL https://sentry.io/get-cli/ | bash
+      - run:
+          name: Create Sentry Release Object
+          command: |
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            sentry-cli releases -p ${SENTRY_PROJECT_NAME} new ${SEMVER}
+            sentry-cli releases -p ${SENTRY_PROJECT_NAME} set-commits --auto ${SEMVER}
+            sentry-cli releases -p ${SENTRY_PROJECT_NAME} finalize ${SEMVER}
+
+  deploy-production:
     <<: *defaults
     steps:
-      - attach_workspace : 
-          at: ~/utility-service
+      - attach_workspace: 
+          at: ~/learning-object-service
+      - setup_remote_docker
       - run:
-          name: Setup AWS credentials
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Pull Image
+          command: docker pull "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}"
+      - run:
+          name: Publish Image 
           command: |
-            mkdir ~/.aws && printf "[profile default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
-      - run: 
-          name: Copy package.json
-          command: cp ./package.json ./dist
-      - run: 
-          name: Zip dist
-          command: cd ./dist; zip -r ../dist.zip . *; cd ..
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            docker tag "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}" "${DOCKER_USER_ORG}/learning-object-service:${SEMVER}"
+            docker push "${DOCKER_USER_ORG}/utility-service:${SEMVER}"
       - run:
-          name: Deploy to Elastic Beanstalk 
-          command: eb deploy Gateway-API --verbose --label Gateway-API-v$(node -p "require('./package.json').version")
+          name: Deploy to ECS
+          command: |
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            export DOCKER_IMAGE="${DOCKER_USER_ORG}/utility-service:${SEMVER}"
+            chmod +x ./deploy.sh
+            sh ./deploy.sh
 workflows:
   version: 2
-  build:
+  build-test:
     jobs:
       - build:
           filters:
             branches:
               ignore: /master/
-  build-and-deploy:
+      - test:
+          filters:
+            branches:
+              ignore: /master/
+          requires:
+            - build
+              
+  build-test-sentry-deploy:
     jobs:
       - build:
           filters:
             branches:
               only: /master/
-      - deploy:
+      - test:
           requires:
             - build
+          filters:
+            branches:
+              only: /master/
+      - create-sentry-release:
+          requires:
+            - test
+          filters:
+            branches:
+              only: /master/
+      - deploy-production:
+          requires:
+            - create-sentry-release
           filters:
             branches:
               only: /master/
