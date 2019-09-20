@@ -62,6 +62,8 @@ workflows:
           filters:
             branches:
               ignore: /master/
+          requires:
+            - build
               
   build-and-deploy:
     jobs:
