@@ -102,15 +102,9 @@ workflows:
           filters:
             branches:
               only: /master/
-      - create-sentry-release:
-          requires:
-            - test
-          filters:
-            branches:
-              only: /master/
       - deploy-production:
           requires:
-            - create-sentry-release
+            - test
           filters:
             branches:
               only: /master/
