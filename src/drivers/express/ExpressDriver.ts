@@ -42,7 +42,7 @@ export class ExpressDriver {
     /**
      * Get port from environment and store in Express.
      */
-    const port = process.env.PORT || '3000';
+    const port = process.env.PORT || '9000';
     this.app.set('port', port);
 
     /**
@@ -57,7 +57,7 @@ export class ExpressDriver {
      * Listen on provided port, on all network interfaces.
      */
     server.listen(port, () =>
-      console.log(`CLARK Gateway API running on localhost:${port}`),
+      console.log(`CLARK Utility Service running on localhost:${port}`),
     );
 
     return this.app;

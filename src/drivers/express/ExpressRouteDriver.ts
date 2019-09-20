@@ -8,6 +8,7 @@ import {
 } from '../../routes';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
+import * as interactor from '../../maintenance/maintenanceInteractor';
 
 const BUSINESS_CARD_API = process.env.BUSINESS_CARD_API || 'localhost:3009';
 
@@ -37,8 +38,19 @@ export default class ExpressRouteDriver {
    */
   setRoutes(router: Router) {
 
+    router.get('/', async(req, res) => {
+      res.send('CLARK Utility Service running on localhost:9000');
+    });
+
+    // APP STATUS
     router.get('/status', async (req, res) => {
       res.send(ServerlessCache.cachedValue);
+    });
+
+    // CLARK MAINTENANCE NOTIFICATION
+    router.get('/maintenance', async(req, res) => {
+      const mango = await interactor.getMaintenanceStatus();
+      res.send(mango);
     });
 
     // BUSINESS CARDS
@@ -52,6 +64,7 @@ export default class ExpressRouteDriver {
       }),
     );
 
+    // VERSION CHECK
     router.get('/clientversion/:clientVersion', async (req, res) => {
       try {
         const response = await fetch(process.env.CLIENTVERSIONURL);
