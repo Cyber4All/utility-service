@@ -1,15 +1,9 @@
 import * as express from 'express';
 import { Router } from 'express';
-// tslint:disable-next-line:no-require-imports
-import proxy = require('express-http-proxy');
 import 'dotenv/config';
-import {
-  BUSINESS_CARD_ROUTES,
-} from '../../routes';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
-
-const BUSINESS_CARD_API = process.env.BUSINESS_CARD_API || 'localhost:3009';
+import * as interactor from '../../maintenance/maintenanceInteractor';
 
 /**
  * Serves as a factory for producing a router for the express app.rt
@@ -37,21 +31,22 @@ export default class ExpressRouteDriver {
    */
   setRoutes(router: Router) {
 
+    router.get('/', async(req, res) => {
+      res.send('CLARK Utility Service running on localhost:9000');
+    });
+
+    // APP STATUS
     router.get('/status', async (req, res) => {
       res.send(ServerlessCache.cachedValue);
     });
 
-    // BUSINESS CARDS
-    router.get(
-      '/users/:username/cards',
-      proxy(BUSINESS_CARD_API, {
-        proxyReqPathResolver: req => {
-          const username = req.params.username;
-          return BUSINESS_CARD_ROUTES.CARD(username, req.query);
-        },
-      }),
-    );
+    // CLARK MAINTENANCE NOTIFICATION
+    router.get('/maintenance', async(req, res) => {
+      const mango = await interactor.getMaintenanceStatus();
+      res.send(mango);
+    });
 
+    // VERSION CHECK
     router.get('/clientversion/:clientVersion', async (req, res) => {
       try {
         const response = await fetch(process.env.CLIENTVERSIONURL);

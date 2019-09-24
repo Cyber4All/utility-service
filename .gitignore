@@ -6,6 +6,7 @@ npm-debug.log
 /tmp
 src/config/aws-sdk/config.json
 src/entity
+/coverage
 
 .env
 dist.zip
