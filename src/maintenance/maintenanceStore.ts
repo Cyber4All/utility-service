@@ -21,7 +21,7 @@ export class MaintenanceStore {
     }
 
     /**
-     * Returns the maintenance status from the mongodb collection
+     * Returns the maintenance status from the mongodb downtime collection
      */
     async getMaintenanceStatus() {
         const result = await this.db.collection(COLLECTIONS.MAINTENANCE)
