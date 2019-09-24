@@ -25,7 +25,7 @@ export class MaintenanceStore {
      */
     async getMaintenanceStatus() {
         const result = await this.db.collection(COLLECTIONS.MAINTENANCE)
-        .findOne({}, { projection: { clarkDown: 1 } });
+        .findOne({}, {sort: {$natural: -1}});
         return result.clarkDown;
     }
 }
