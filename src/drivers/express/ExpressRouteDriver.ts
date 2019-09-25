@@ -4,12 +4,12 @@ import 'dotenv/config';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
 import * as interactor from '../../maintenance/maintenanceInteractor';
-
 /**
  * Serves as a factory for producing a router for the express app.rt
  *
  * @author Sean Donnelly
  */
+
 export default class ExpressRouteDriver {
   /**
    * Produces a configured express router
@@ -44,6 +44,20 @@ export default class ExpressRouteDriver {
     router.get('/maintenance', async(req, res) => {
       const mango = await interactor.getMaintenanceStatus();
       res.send(mango);
+    });
+
+    // SET CLARK MAINTENANCE NOTIFICATION
+    router.post('/maintenance', async(req, res) => {
+      try {
+        const val = req.body.clarkDown;
+        const user = req;
+        console.log(user);
+        // await interactor.setMaintenanceStatus(req.body);
+        res.status(200).send(JSON.stringify(req));
+      } catch (e) {
+        console.log(e);
+        res.status(500).send('Could not toggle down page');
+      }
     });
 
     // VERSION CHECK
