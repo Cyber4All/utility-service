@@ -50,10 +50,13 @@ export default class ExpressRouteDriver {
     router.post('/maintenance', async(req, res) => {
       try {
         const val = req.body.clarkDown;
-        const user = req;
-        console.log(user);
-        // await interactor.setMaintenanceStatus(req.body);
-        res.status(200).send(JSON.stringify(req));
+        const accessGroup = req.user.accessGroups;
+        if (accessGroup === 'admin') {
+          // await interactor.setMaintenanceStatus(req.body);
+          res.status(200).send('Maintenance page toggled');
+        } else {
+          res.status(401).send('You do not have the authority to toggle maintenance page')
+        }
       } catch (e) {
         console.log(e);
         res.status(500).send('Could not toggle down page');
