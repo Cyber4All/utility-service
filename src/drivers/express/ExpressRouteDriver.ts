@@ -51,13 +51,9 @@ export default class ExpressRouteDriver {
       try {
         const val = req.body.clarkDown;
         const user = req.user;
-        if (user.accessGroups !== undefined) {
-          if (user.accessGroups.includes('admin')) {
-            // await interactor.setMaintenanceStatus(val);
-            res.status(200).send('Maintenance page toggled.');
-          } else if (!user.accessGroups.includes('admin')) {
-            res.status(401).send('You do not have the authority to toggle the maintenance page.');
-          }
+        if (user.accessGroups !== undefined && user.accessGroups.includes('admin')) {
+          await interactor.setMaintenanceStatus(val);
+          res.status(200).send('Maintenance page toggled.');
         } else {
           res.status(401).send('You do not have the authority to toggle the maintenance page.');
         }
