@@ -7,7 +7,7 @@ import * as interactor from '../../maintenance/maintenanceInteractor';
 /**
  * Serves as a factory for producing a router for the express app.rt
  *
- * @author Sean Donnelly
+ * @author Paige Zaleppa
  */
 
 export default class ExpressRouteDriver {
@@ -54,10 +54,11 @@ export default class ExpressRouteDriver {
         if (user.accessGroups !== undefined && user.accessGroups.includes('admin')) {
           await interactor.setMaintenanceStatus(val);
           res.status(200).send('Maintenance page toggled.');
-        } else {
+        } else if (user.accessGroups === undefined && !user.accessGroups.includes('admin')) {
           res.status(401).send('You do not have the authority to toggle the maintenance page.');
         }
       } catch (e) {
+        console.log('error', e);
         res.status(500).send('Could not toggle down page.');
       }
     });
