@@ -6,6 +6,8 @@ import { ExpressRouteDriver } from '../drivers';
 import * as cors from 'cors';
 import * as dotenv from 'dotenv';
 import { sentryRequestHandler, sentryErrorHandler } from '../../shared/SentryConnector';
+import { enforceAuthenticatedAccess, handleProcessTokenError, processToken } from '../../middleware';
+import * as cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -31,10 +33,20 @@ export class ExpressDriver {
     this.app.use(logger('combined'));
 
     // configure app to use bodyParser()
-    this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-    this.app.use(bodyParser.json({ limit: '50mb' }));
+    this.app.use(
+      bodyParser.urlencoded({
+        extended: true,
+      }),
+    );
+    this.app.use(bodyParser.json());
 
     this.app.use(cors({ origin: true, credentials: true }));
+    this.app.set('trust proxy', true);
+    this.app.use(cookieParser());
+
+    this.app.use(processToken, handleProcessTokenError);
+
+    this.app.use(enforceAuthenticatedAccess);
 
     // Set our api routes
     this.app.use('/', ExpressRouteDriver.buildRouter());
@@ -62,4 +74,5 @@ export class ExpressDriver {
 
     return this.app;
   }
+
 }
