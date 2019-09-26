@@ -48,8 +48,6 @@ export class ExpressDriver {
     // Set our public api routes
     this.app.use('/', ExpressRouteDriver.buildRouter());
 
-    this.app.use(processToken, handleProcessTokenError);
-
     this.app.use(enforceAuthenticatedAccess);
 
     // Set our authenticated api routes
