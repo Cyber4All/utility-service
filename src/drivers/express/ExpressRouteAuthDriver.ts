@@ -17,13 +17,12 @@ export class ExpressRouteAuthDriver {
           const user = req.user;
           if (user.accessGroups !== undefined && user.accessGroups.includes('admin')) {
             // await interactor.setMaintenanceStatus(val);
-            res.status(200).send('Maintenance page toggled.');
+            res.sendStatus(204);
           } else if (user.accessGroups === undefined || !user.accessGroups.includes('admin')) {
-            res.status(401).send('You do not have the authority to toggle the maintenance page.');
+            res.sendStatus(401);
           }
         } catch (e) {
-          console.log('error', e);
-          res.status(500).send('Could not toggle down page.');
+          res.sendStatus(500);
         }
       });
     }
