@@ -45,7 +45,7 @@ export class ExpressDriver {
     this.app.set('trust proxy', true);
     this.app.use(cookieParser());
 
-    // Set our api routes
+    // Set our public api routes
     this.app.use('/', ExpressRouteDriver.buildRouter());
 
     this.app.use(processToken, handleProcessTokenError);
