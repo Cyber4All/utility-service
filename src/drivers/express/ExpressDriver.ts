@@ -8,6 +8,7 @@ import * as dotenv from 'dotenv';
 import { sentryRequestHandler, sentryErrorHandler } from '../../shared/SentryConnector';
 import { enforceAuthenticatedAccess, handleProcessTokenError, processToken } from '../../middleware';
 import * as cookieParser from 'cookie-parser';
+import { ExpressRouteAuthDriver } from '../drivers';
 
 dotenv.config();
 
@@ -44,12 +45,15 @@ export class ExpressDriver {
     this.app.set('trust proxy', true);
     this.app.use(cookieParser());
 
+    // Set our api routes
+    this.app.use('/', ExpressRouteDriver.buildRouter());
+
     this.app.use(processToken, handleProcessTokenError);
 
     this.app.use(enforceAuthenticatedAccess);
 
-    // Set our api routes
-    this.app.use('/', ExpressRouteDriver.buildRouter());
+    // Set our authenticated api routes
+    this.app.use(ExpressRouteAuthDriver.buildRouter());
 
     /**
      * Get port from environment and store in Express.
