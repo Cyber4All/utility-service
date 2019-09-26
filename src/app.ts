@@ -1,7 +1,9 @@
 import { ExpressDriver } from './drivers/drivers';
 import { ServerlessCache } from './cache';
 import { MongoDriver } from './drivers/MongoDriver';
+import 'dotenv/config';
 const environment = process.env.NODE_ENV;
+
 // ----------------------------------------------------------------------------------
 // Initializations
 // ----------------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 /**
  * This module exports an error reporting function for use in error cases we cannot recover from.
  * Depending on the environment, reported errors are directed to different locations. In development,
