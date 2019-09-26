@@ -35,16 +35,12 @@ export class MaintenanceStore {
      */
 
     async setMaintenanceStatus(record: boolean) {
-       try {
-          const obj = {
+        const obj = {
             _id: new ObjectId().toHexString(),
             clarkDown: record,
             timestamp: Date.now(),
           };
-          await this.db.collection(COLLECTIONS.MAINTENANCE)
-          .insertOne(obj);
-        } catch (e) {
-            return Promise.reject(e);
-        }
+        await this.db.collection(COLLECTIONS.MAINTENANCE)
+        .insertOne(obj);
     }
 }
