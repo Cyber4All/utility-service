@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as interactor from '../../maintenance/maintenanceInteractor';
+import { mapErrorToResponseData } from '../../shared/errors';
 
 export class ExpressRouteAuthDriver {
     public static buildRouter(): Router {
@@ -16,13 +17,14 @@ export class ExpressRouteAuthDriver {
           const val = req.body.clarkDown;
           const user = req.user;
           if (user.accessGroups !== undefined && user.accessGroups.includes('admin')) {
-            // await interactor.setMaintenanceStatus(val);
+            await interactor.setMaintenanceStatus(val);
             res.sendStatus(204);
-          } else if (user.accessGroups === undefined || !user.accessGroups.includes('admin')) {
+          } else {
             res.sendStatus(401);
           }
         } catch (e) {
-          res.sendStatus(500);
+            const code = mapErrorToResponseData(e);
+            res.status(code);
         }
       });
     }
