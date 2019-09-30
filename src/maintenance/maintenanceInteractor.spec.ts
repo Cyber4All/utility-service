@@ -37,7 +37,12 @@ describe('get maintenance status', () => {
             .resolves.toBe(true);
     });
     it('should return undefined because the user is an admin', () => {
-      expect(maintenance.setAuthorization(AUTHORIZEDMOCKUSER)).toBeUndefined();
+      expect(maintenance.setAuthorization(AUTHORIZEDMOCKUSER)).not.toBe(
+        new ResourceError(
+          'Invalid access',
+          ResourceErrorReason.INVALID_ACCESS,
+        ),
+      );
     });
     it('should throw an error because the user is not an admin', () => {
       expect(() => {
