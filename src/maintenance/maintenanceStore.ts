@@ -1,4 +1,4 @@
-import { Db } from 'mongodb';
+import { Db, ObjectId } from 'mongodb';
 import { MongoDriver } from '../drivers/MongoDriver';
 
 export enum COLLECTIONS {
@@ -21,11 +21,26 @@ export class MaintenanceStore {
     }
 
     /**
-     * Returns the maintenance status from the mongodb collection
+     * Returns the maintenance status from the mongodb downtime collection
      */
     async getMaintenanceStatus() {
         const result = await this.db.collection(COLLECTIONS.MAINTENANCE)
         .findOne({}, {sort: {$natural: -1}});
         return result.clarkDown;
+    }
+
+    /**
+     * Inserts a downtime record into the downtime collection
+     * @param record the maintenance status and timestamp
+     */
+
+    async setMaintenanceStatus(record: boolean) {
+        const obj = {
+            _id: new ObjectId().toHexString(),
+            clarkDown: record,
+            timestamp: Date.now(),
+          };
+        await this.db.collection(COLLECTIONS.MAINTENANCE)
+        .insertOne(obj);
     }
 }

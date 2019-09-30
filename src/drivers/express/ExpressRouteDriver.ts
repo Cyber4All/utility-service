@@ -4,12 +4,12 @@ import 'dotenv/config';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
 import * as interactor from '../../maintenance/maintenanceInteractor';
-
 /**
  * Serves as a factory for producing a router for the express app.rt
  *
- * @author Sean Donnelly
+ * @author Paige Zaleppa
  */
+
 export default class ExpressRouteDriver {
   /**
    * Produces a configured express router

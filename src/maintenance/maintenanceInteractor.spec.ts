@@ -1,3 +1,22 @@
+import { UserToken } from '../shared/user-token';
+import { ResourceError, ResourceErrorReason } from '../errors';
+
+const AUTHORIZEDMOCKUSER: UserToken = {
+    'username': 'tester',
+    'name': 'test the master',
+    'email': 'test@test.com',
+    'organization' : 'test',
+    'emailVerified': true,
+    'accessGroups': ['admin'],
+};
+const MOCKUSER: UserToken = {
+    'username': 'tester',
+    'name': 'test the master',
+    'email': 'test@test.com',
+    'organization' : 'test',
+    'emailVerified': true,
+    'accessGroups': ['reviewer'],
+}
 let maintenance: any;
 describe('get maintenance status', () => {
     beforeAll(async() => {
@@ -7,7 +26,7 @@ describe('get maintenance status', () => {
               getInstance: () => ({
                 getMaintenanceStatus: async () => {
                     return true;
-                }
+                },
               }),
             },
           }));
@@ -16,6 +35,25 @@ describe('get maintenance status', () => {
     it('should return a boolean to determine if the site is under maintenance', async () => {
         await expect(maintenance.getMaintenanceStatus())
             .resolves.toBe(true);
+    });
+    it('should return undefined because the user is an admin', () => {
+      expect(maintenance.setAuthorization(AUTHORIZEDMOCKUSER)).not.toBe(
+        new ResourceError(
+          'Invalid access',
+          ResourceErrorReason.INVALID_ACCESS,
+        ),
+      );
+    });
+    it('should throw an error because the user is not an admin', () => {
+      expect(() => {
+        maintenance.setAuthorization(MOCKUSER);
+      },
+        ).toThrow(
+          new ResourceError(
+            'Invalid access',
+            ResourceErrorReason.INVALID_ACCESS,
+          ),
+        );
     });
 });
 
