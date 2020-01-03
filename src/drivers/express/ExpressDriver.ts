@@ -9,6 +9,8 @@ import { sentryRequestHandler, sentryErrorHandler } from '../../shared/SentryCon
 import { enforceAuthenticatedAccess, handleProcessTokenError, processToken } from '../../middleware';
 import * as cookieParser from 'cookie-parser';
 import { ExpressRouteAuthDriver } from '../drivers';
+import * as statusInteractor from '../../status/statusInteractor';
+import * as WebSocket from 'ws';
 
 dotenv.config();
 
@@ -66,6 +68,14 @@ export class ExpressDriver {
     server.keepAliveTimeout = KEEP_ALIVE_TIMEOUT
       ? parseInt(KEEP_ALIVE_TIMEOUT, 10)
       : server.keepAliveTimeout;
+
+    // SYSTEM STATUS WEBSOCKET
+    const socket = new WebSocket.Server({ server });
+    socket.on('connection', (ws: WebSocket) => {
+      statusInteractor.outageReportChange((changes: any[]) => {
+        ws.send(changes);
+      });
+    });
 
     /**
      * Listen on provided port, on all network interfaces.
