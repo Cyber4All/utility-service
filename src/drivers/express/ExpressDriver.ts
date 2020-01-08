@@ -11,6 +11,7 @@ import * as cookieParser from 'cookie-parser';
 import { ExpressRouteAuthDriver } from '../drivers';
 import * as statusInteractor from '../../status/statusInteractor';
 import * as WebSocket from 'ws';
+import { OutageReport } from '../../shared/outageReport';
 
 dotenv.config();
 
@@ -72,7 +73,7 @@ export class ExpressDriver {
     // SYSTEM STATUS WEBSOCKET
     const socket = new WebSocket.Server({ server, path: '/outages' });
     socket.on('connection', (ws: WebSocket) => {
-      statusInteractor.outageReportChange((changes: any[]) => {
+      statusInteractor.outageReportChange((changes: OutageReport[]) => {
         ws.send(JSON.stringify(changes));
       });
     });

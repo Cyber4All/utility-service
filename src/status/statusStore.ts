@@ -1,5 +1,6 @@
 import { Db, ObjectId } from 'mongodb';
 import { MongoDriver } from '../drivers/MongoDriver';
+import { OutageReport } from '../shared/outageReport';
 
 export enum COLLECTIONS {
   OUTAGE_REPORTS = 'platform-outage-reports',
@@ -28,7 +29,7 @@ export class StatusStore {
     outageReportChanged(callback: Function) {
         const stream = this.db.collection(COLLECTIONS.OUTAGE_REPORTS).watch();
         stream.on('change', async () => {
-            const changes = await this.db.collection(COLLECTIONS.OUTAGE_REPORTS).find({ resolved: null }).toArray();
+            const changes: OutageReport[] = await this.db.collection(COLLECTIONS.OUTAGE_REPORTS).find({ resolved: null }).toArray();
             callback(changes);
         });
     }
