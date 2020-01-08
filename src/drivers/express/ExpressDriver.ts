@@ -70,10 +70,10 @@ export class ExpressDriver {
       : server.keepAliveTimeout;
 
     // SYSTEM STATUS WEBSOCKET
-    const socket = new WebSocket.Server({ server });
+    const socket = new WebSocket.Server({ server, path: '/outages' });
     socket.on('connection', (ws: WebSocket) => {
       statusInteractor.outageReportChange((changes: any[]) => {
-        ws.send(changes);
+        ws.send(JSON.stringify(changes));
       });
     });
 
