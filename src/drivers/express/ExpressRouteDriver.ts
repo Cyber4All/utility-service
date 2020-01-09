@@ -3,7 +3,8 @@ import { Router } from 'express';
 import 'dotenv/config';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
-import * as interactor from '../../maintenance/maintenanceInteractor';
+import * as maintenanceInteractor from '../../maintenance/maintenanceInteractor';
+
 /**
  * Serves as a factory for producing a router for the express app.rt
  *
@@ -42,7 +43,7 @@ export default class ExpressRouteDriver {
 
     // CLARK MAINTENANCE NOTIFICATION
     router.get('/maintenance', async(req, res) => {
-      const mango = await interactor.getMaintenanceStatus();
+      const mango = await maintenanceInteractor.getMaintenanceStatus();
       res.send(mango);
     });
 
