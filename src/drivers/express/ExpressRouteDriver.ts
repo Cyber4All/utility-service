@@ -72,9 +72,10 @@ export default class ExpressRouteDriver {
 
     router.get('/outages', async (req, res) => {
       try {
-        const past: boolean = req.query.past;
-        if (past) {
-          const pastIssues: OutageReport[] = [];
+        const past: string = req.query.pastIssues;
+
+        if (past === 'true') {
+          const pastIssues: OutageReport[] = await statusInteractor.getRecentPastIssues();
           res.status(200).send(pastIssues);
         } else {
           const activeIssues: OutageReport[] = await statusInteractor.statusReport();
