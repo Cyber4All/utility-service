@@ -4,6 +4,8 @@ import 'dotenv/config';
 import fetch from 'node-fetch';
 import { ServerlessCache } from '../../cache';
 import * as maintenanceInteractor from '../../maintenance/maintenanceInteractor';
+import * as statusInteractor from '../../status/statusInteractor';
+import { OutageReport } from '../../shared/outageReport';
 
 /**
  * Serves as a factory for producing a router for the express app.rt
@@ -65,6 +67,23 @@ export default class ExpressRouteDriver {
         }
       } catch (e) {
         res.status(500).send('Could not recover the client version');
+      }
+    });
+
+    // SYSTEM OUTAGES (Past and Current)
+    router.get('/outages', async (req, res) => {
+      try {
+        const past: string = req.query.pastIssues;
+
+        if (past === 'true') {
+          const pastIssues: OutageReport[] = await statusInteractor.getRecentPastIssues();
+          res.status(200).send(pastIssues);
+        } else {
+          const activeIssues: OutageReport[] = await statusInteractor.statusReport();
+          res.status(200).send(activeIssues);
+        }
+      } catch (e) {
+        res.status(500).send('Unable to get system outages');
       }
     });
   }

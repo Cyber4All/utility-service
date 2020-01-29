@@ -1,5 +1,9 @@
 import { StatusStore } from './statusStore';
 
+export async function getRecentPastIssues() {
+    return await getDataStore().getRecentPastIssues();
+}
+
 export async function statusReport() {
     return await getDataStore().statusReport();
 }

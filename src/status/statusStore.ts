@@ -22,6 +22,13 @@ export class StatusStore {
     }
 
     /**
+     * Get a array of 10 resolved statuses, sorted in most recently resolved order
+     */
+    async getRecentPastIssues(): Promise<OutageReport[]> {
+        return await this.db.collection(COLLECTIONS.OUTAGE_REPORTS).find({ resolved: { $ne: null }}).sort({ resolved: -1 }).limit(10).toArray();
+    }
+
+    /**
      * Returns the current unresolved statuses as an array of OutageReport[]
      */
     async statusReport(): Promise<OutageReport[]> {
