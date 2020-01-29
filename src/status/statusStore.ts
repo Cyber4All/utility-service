@@ -22,6 +22,13 @@ export class StatusStore {
     }
 
     /**
+     * Returns the current unresolved statuses as an array of OutageReport[]
+     */
+    async statusReport(): Promise<OutageReport[]> {
+        return await this.db.collection(COLLECTIONS.OUTAGE_REPORTS).find({ resolved: null }).toArray();
+    }
+
+    /**
      * Checks if the collection for outage reports has changed and returns back a updated list
      * of outages to the client via a callback method
      * @param callback The callback function that handles sending the reports to the client
@@ -29,7 +36,7 @@ export class StatusStore {
     outageReportChanged(callback: Function) {
         const stream = this.db.collection(COLLECTIONS.OUTAGE_REPORTS).watch();
         stream.on('change', async () => {
-            const changes: OutageReport[] = await this.db.collection(COLLECTIONS.OUTAGE_REPORTS).find({ resolved: null }).toArray();
+            const changes: OutageReport[] = await this.statusReport();
             callback(changes);
         });
     }

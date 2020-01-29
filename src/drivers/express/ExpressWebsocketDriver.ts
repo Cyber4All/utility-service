@@ -11,9 +11,10 @@ export function setupWebsockets(server: http.Server) {
      * client as string data, to be parsed on recieve
      */
     const socket = new WebSocket.Server({ server, path: '/outages' });
-    socket.on('connection', (ws: WebSocket) => {
+    socket.on('connection', async (ws: WebSocket) => {
         statusInteractor.outageReportChange((changes: OutageReport[]) => {
             ws.send(JSON.stringify(changes));
         });
+        ws.send(JSON.stringify(await statusInteractor.statusReport()));
     });
 }
