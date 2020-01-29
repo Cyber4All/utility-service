@@ -21,6 +21,10 @@ export class StatusStore {
         return this.instance;
     }
 
+    async statusReport() {
+        return await this.db.collection(COLLECTIONS.OUTAGE_REPORTS).find({ resolved: null }).toArray();
+    }
+
     /**
      * Checks if the collection for outage reports has changed and returns back a updated list
      * of outages to the client via a callback method

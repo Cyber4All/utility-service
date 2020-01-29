@@ -6,7 +6,7 @@ import { ExpressRouteDriver } from '../drivers';
 import * as cors from 'cors';
 import * as dotenv from 'dotenv';
 import { sentryRequestHandler, sentryErrorHandler } from '../../shared/SentryConnector';
-import { enforceAuthenticatedAccess, handleProcessTokenError, processToken } from '../../middleware';
+import { enforceAuthenticatedAccess } from '../../middleware';
 import * as cookieParser from 'cookie-parser';
 import { ExpressRouteAuthDriver } from '../drivers';
 import { setupWebsockets } from './ExpressWebsocketDriver';
