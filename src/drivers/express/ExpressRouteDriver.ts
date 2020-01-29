@@ -70,6 +70,7 @@ export default class ExpressRouteDriver {
       }
     });
 
+    // SYSTEM OUTAGES (Past and Current)
     router.get('/outages', async (req, res) => {
       try {
         const past: string = req.query.pastIssues;
