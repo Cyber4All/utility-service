@@ -29,7 +29,7 @@ export class MongoDriver {
       } else {
         reportError(error);
         return Promise.reject(
-          `Problem connecting to database at ${dbURI}. \n ${error}`
+          `Problem connecting to database at ${dbURI}. \n ${error}`,
         );
       }
     }

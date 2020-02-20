@@ -6,6 +6,7 @@ import { ServerlessCache } from '../../cache';
 import * as maintenanceInteractor from '../../maintenance/maintenanceInteractor';
 import * as statusInteractor from '../../status/statusInteractor';
 import { OutageReport } from '../../shared/outageReport';
+import * as userInterractor from '../../users/userInteractor';
 
 /**
  * Serves as a factory for producing a router for the express app.rt
@@ -47,6 +48,11 @@ export default class ExpressRouteDriver {
     router.get('/maintenance', async(req, res) => {
       const mango = await maintenanceInteractor.getMaintenanceStatus();
       res.send(mango);
+    });
+
+    router.get('/utility-users', async(req, res) => {
+      const users = await userInterractor.getUsers();
+      res.send(users);
     });
 
     // VERSION CHECK
