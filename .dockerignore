@@ -2,5 +2,6 @@
 
 ,git
 *Dockerfile*
+*Dockerfile.prod*
 *docker-compose*
 node_modules

@@ -1,0 +1,11 @@
+# Anything beyond local dev should pin this to a specific version at https://hub.docker.com/_/node/
+FROM node:8
+
+# install dependencies in a different location for easier app bind mounting for local development
+WORKDIR /user
+COPY . .
+
+# Build source and clean up
+RUN npm install && npm cache clean --force
+RUN npm run build
+CMD ["node", "dist/app.js"]
