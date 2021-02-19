@@ -1,16 +1,18 @@
-# Anything beyond local dev should pin this to a specific version at https://hub.docker.com/_/node/
-FROM node:8
-
-# install dependencies in a different location for easier app bind mounting for local development
-WORKDIR /user
-COPY package.json package-lock.json* jest.config.js tsconfig.json ./
-RUN npm install && npm cache clean --force
-ENV PATH /opt/node_modules/.bin:$PATH
-
-WORKDIR /user/app
+FROM node:8 as build
+WORKDIR /build
 COPY . .
-
-# Build source and clean up
+# install dependencies and build
 RUN npm install
+RUN npm run build
 
-CMD ["npm", "start"]
+# ----------------------------------------------------------------
+# SERVE STAGE
+# ----------------------------------------------------------------
+
+FROM node:12-alpine as serve
+WORKDIR /opt/app
+COPY package.json package-lock.json* .env* ./
+COPY --from=build /build/dist ./dist
+RUN npm install --only=prod
+EXPOSE 9000
+CMD ["node", "dist/app.js"]
