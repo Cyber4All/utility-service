@@ -65,14 +65,14 @@ jobs:
             sh ./deploy.sh
 workflows:
   version: 2
-  build-test:
+  build:
     jobs:
       - build:
           filters:
             branches:
               ignore: /master/
               
-  build-test-sentry-deploy:
+  build-sentry-deploy:
     jobs:
       - build:
           filters:
