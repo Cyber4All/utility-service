@@ -79,8 +79,6 @@ workflows:
             branches:
               only: /master/
       - deploy-production:
-          requires:
-            - test
           filters:
             branches:
               only: /master/
