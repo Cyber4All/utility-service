@@ -11,7 +11,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Build Image
+          name: Build Image and test 
           command: |
             docker build -t $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 .
       - run:
@@ -21,17 +21,6 @@ jobs:
           name: Publish Image
           command: |
             docker push "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}"
-
-  test:
-    <<: *defaults
-    steps: 
-      - setup_remote_docker
-      - run: 
-          name: Get Image
-          command: docker pull $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1
-      - run: 
-          name: Run Tests
-          command: docker run $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 npm test
 
   create-sentry-release:
     <<: *defaults
@@ -82,12 +71,6 @@ workflows:
           filters:
             branches:
               ignore: /master/
-      - test:
-          filters:
-            branches:
-              ignore: /master/
-          requires:
-            - build
               
   build-test-sentry-deploy:
     jobs:
@@ -95,15 +78,7 @@ workflows:
           filters:
             branches:
               only: /master/
-      - test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: /master/
       - deploy-production:
-          requires:
-            - test
           filters:
             branches:
               only: /master/
