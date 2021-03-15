@@ -1,7 +1,8 @@
-import * as request from 'request';
 import { reportError } from './shared/SentryConnector';
 const APP_STATUS = process.env.APP_STATUS_URI;
 import { EventEmitter } from 'events';
+
+const fetch = require('node-fetch');
 
 class Emitter extends EventEmitter {}
 
@@ -18,12 +19,9 @@ export class ServerlessCache {
      }
 
     static fillCache() {
-        request(APP_STATUS, function(error, response, body) {
-            if (error) {
-                reportError(error);
-            } else {
-                ServerlessCache.cachedValue = body;
-            }
-        });
+        fetch(APP_STATUS)
+            .then((res: any) => res.json())
+            .then((json: any) => ServerlessCache.cachedValue = json)
+            .catch((e: any) => reportError(e));
     }
 }
