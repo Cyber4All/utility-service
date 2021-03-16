@@ -1,7 +1,8 @@
 # Build Stage 
-FROM node:8 as build
+FROM node:12 as build
 WORKDIR /build
 COPY . .
+COPY package.json package-lock.json* .env* ./
 RUN npm install
 RUN npm test
 RUN npm run build
