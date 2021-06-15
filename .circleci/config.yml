@@ -16,7 +16,7 @@ jobs:
             docker build -t $DOCKER_USER_ORG/utility-service:$CIRCLE_SHA1 .
       - run:
           name: Login to docker
-          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+          command: docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
       - run:
           name: Publish Image
           command: |
@@ -46,7 +46,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Login to docker
-          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+          command: docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
       - run:
           name: Pull Image
           command: docker pull "${DOCKER_USER_ORG}/utility-service:${CIRCLE_SHA1}"
@@ -68,6 +68,8 @@ workflows:
   build-test:
     jobs:
       - build:
+          context:
+            - DockerHub
           filters:
             branches:
               ignore: /master/
@@ -75,10 +77,14 @@ workflows:
   build-test-sentry-deploy:
     jobs:
       - build:
+          context:
+            - DockerHub
           filters:
             branches:
               only: /master/
       - deploy-production:
+          context:
+            - DockerHub
           filters:
             branches:
               only: /master/
