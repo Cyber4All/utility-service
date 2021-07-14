@@ -2,8 +2,13 @@ defaults: &defaults
   working_directory: ~/utility-service
   docker:
     - image: cyber4all/circleci-aws:docker-git
-
-version: 2
+orbs:
+  docker: circleci/docker@1.4.0
+  aws-cli: circleci/aws-cli@1.2.1
+commands:
+  install-aws: aws-cli/install
+  setup-aws-cli: aws-cli/setup
+version: 2.1
 jobs:
   build:
     <<: *defaults
@@ -44,6 +49,11 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - setup-aws-cli:
+          aws-access-key-id: AWS_ECS_AccessKey
+          aws-region: AWS_REGION_N_VA
+          aws-secret-access-key: AWS_ECS_SecretKey
+          version: "1"
       - run:
           name: Login to docker
           command: docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
@@ -64,7 +74,7 @@ jobs:
             chmod +x ./deploy.sh
             sh ./deploy.sh
 workflows:
-  version: 2
+  version: 2.1
   build-test:
     jobs:
       - build:
@@ -85,6 +95,7 @@ workflows:
       - deploy-production:
           context:
             - DockerHub
+            - AWS
           filters:
             branches:
               only: /master/
